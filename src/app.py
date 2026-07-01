@@ -5,13 +5,21 @@ import streamlit as st
 
 # ============ CONFIGURAÇÃO ============
 OLLAMA_URL = "http://localhost:11434/api/generate"
-MODELO = "gpt-oss"
+MODELO = "llama3.2:1b"
 
 # ============ CARREGAR DADOS ============
 perfil = json.load(open('./data/perfil_investidor.json'))
 transacoes = pd.read_csv('./data/transacoes.csv')
 historico = pd.read_csv('./data/historico_atendimento.csv')
 produtos = json.load(open('./data/produtos_financeiros.json'))
+
+# ============= RESUMO DAS TRANSAÇÕES ================ 
+gastos = ( 
+  transacoes[transacoes["tipo"] == "saida"]
+  .groupby("categoria")["valor"] 
+  .sum() 
+) 
+total_gastos = gastos.sum()
 
 # ============ MONTAR CONTEXTO ============
 contexto = f"""
@@ -30,7 +38,7 @@ PRODUTOS DISPONÍVEIS:
 """
 
 # ============ SYSTEM PROMPT ============
-SYSTEM_PROMPT = """Você é o Edu, um educador financeiro amigável e didático.
+SYSTEM_PROMPT = """Você é o FinGuide IA, um assistente virtual especializado em educação financeira.
 
 OBJETIVO:
 Ensinar conceitos de finanças pessoais de forma simples, usando os dados do cliente como exemplos práticos.
@@ -60,9 +68,13 @@ def perguntar(msg):
     return r.json()['response']
 
 # ============ INTERFACE ============
-st.title("🎓 Edu, o Educador Financeiro")
+st.set_page_config( page_title="FinGuide IA", page_icon="💰" )
+st.title("💰 FinGuide IA")
 
-if pergunta := st.chat_input("Sua dúvida sobre finanças..."):
-    st.chat_message("user").write(pergunta)
-    with st.spinner("..."):
-        st.chat_message("assistant").write(perguntar(pergunta))
+st.write( "Assistente virtual de educação financeira baseado em Inteligência Artificial." ) 
+pergunta = st.chat_input( "Digite sua dúvida sobre educação financeira..." ) 
+if pergunta: 
+  st.chat_message("user").write(pergunta) 
+  with st.spinner("Pensando..."): 
+    resposta = perguntar(pergunta) 
+    st.chat_message("assistant").write(resposta)
