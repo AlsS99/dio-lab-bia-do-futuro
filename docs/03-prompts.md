@@ -127,7 +127,10 @@ Mais sobre Few-Shot Prompts no artigo [Zero, One e Few-Shot Prompts: Entendendo 
 > Registre aqui ajustes que você fez nos prompts e por quê.
 
 - Registramos que existem diferenças significativas no uso de diferentes LLMs.
-  
+- O modelo utilizado foi o **Llama 3.2:1B**, executado localmente pelo Ollama.
+- Por ser um modelo compacto, algumas respostas apresentaram limitações de interpretação e pequenas alucinações.
+- Para reduzir esses problemas foram adicionadas regras mais rígidas no System Prompt, como impedir recomendações de investimento, limitar o domínio de atuação do agente e orientar o modelo a utilizar apenas a base de conhecimento fornecida.
+- 
 ### Comparação entre Modelos de IA
 
 Durante o desenvolvimento do projeto, o mesmo conjunto de prompts, regras e base de conhecimento foi testado em quatro modelos de IA generativa: ChatGPT, Gemini, Copilot e Claude. O objetivo foi avaliar o comportamento de cada modelo diante das mesmas instruções.
