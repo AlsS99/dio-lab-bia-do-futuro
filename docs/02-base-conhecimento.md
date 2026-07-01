@@ -3,7 +3,7 @@
 > [!TIP]
 > **Prompt usado para esta etapa:**
 > 
-> Organize a base de conhecimento do agente "Edu" usando os 4 arquivos da pasta `data/` (em anexo). Explique pra que serve cada arquivo e monte um exemplo de contexto formatado que será enviado pro LLM. Preencha o template abaixo.
+> Organize a base de conhecimento do agente "FinGuide IA" usando os 4 arquivos da pasta `data/` (em anexo). Explique pra que serve cada arquivo e monte um exemplo de contexto formatado que será enviado pro LLM. Preencha o template abaixo.
 >
 > [cole ou anexe o template `02-base-conhecimento.md` pra contexto]
 
@@ -20,9 +20,14 @@
 
 ## Adaptações nos Dados
 
+A base de conhecimento foi adaptada para tornar as respostas mais próximas de situações reais de educação financeira.
+
 > Você modificou ou expandiu os dados mockados? Descreva aqui.
 
-O produto Fundo Imobiliário (FII) substituiu o Fundo Multimercado, pois pessoalmente me sinto mais confiante em usar apenas produtos financeiros que eu conheço. Assim, poderei validar as respostas do Edu de forma mais assertiva.
+- substituição do **Fundo Multimercado** pelo **Fundo Imobiliário (FII)**;
+- atualização das descrições dos produtos financeiros para facilitar a compreensão de usuários iniciantes;
+- organização dos arquivos em formato JSON e CSV para facilitar o carregamento pelo sistema;
+- padronização dos nomes das categorias financeiras.
 
 ---
 
@@ -42,8 +47,21 @@ transacoes = pd.read_csv('./data/transacoes.csv')
 historico = pd.read_csv('./data/historico_atendimento.csv')
 produtos = json.load(open('./data/produtos_financeiros.json'))
 ```
+Após o carregamento:
+
+- **perfil** contém as informações financeiras do cliente;
+- **produtos** reúne os produtos financeiros disponíveis para fins educativos;
+- **transacoes** registra receitas e despesas do cliente;
+- **historico** armazena os atendimentos anteriores, permitindo manter o contexto das conversas.
+
+Essa abordagem é suficiente para o protótipo do projeto. Em aplicações reais, a base de conhecimento normalmente seria armazenada em bancos de dados ou serviços especializados, permitindo consultas dinâmicas, atualização em tempo real e maior escalabilidade.
+
+---
 
 ### Como os dados são usados no prompt?
+
+Neste protótipo, as informações mais relevantes são consolidadas em um único contexto e enviadas juntamente com o *System Prompt* para o modelo de IA.
+
 > Os dados vão no system prompt? São consultados dinamicamente?
 
 Para simplificar, podemos simplesmente "injetar" os dados em nosso prompt, agarntindo que o Agente tenha o melhor contexto possível. Lembrando que, em soluções mais robustas, o ideal é que essas informaçoes sejam carregadas dinamicamente para que possamos ganhar flexibilidade.
@@ -140,6 +158,23 @@ PRODUTOS DISPONIVEIS PARA ENSINO (data/produtos_financeiros.json):
 ]
 ```
 
+### Descrição dos principais campos
+
+| Campo | Descrição |
+|--------|-----------|
+| **nome** | Identificação do cliente utilizada para personalizar a conversa. |
+| **idade** | Faixa etária do cliente, permitindo contextualizar exemplos educativos. |
+| **profissao** | Profissão informada pelo usuário. |
+| **renda_mensal** | Renda utilizada em simulações e análises financeiras educativas. |
+| **perfil_investidor** | Perfil financeiro (conservador, moderado ou arrojado), usado apenas para contextualizar explicações, sem recomendar investimentos. |
+| **objetivo_principal** | Principal objetivo financeiro do cliente. |
+| **patrimonio_total** | Valor total do patrimônio informado. |
+| **reserva_emergencia_atual** | Valor atualmente reservado para emergências. |
+| **aceita_risco** | Indica se o cliente possui maior tolerância ao risco financeiro. |
+| **metas** | Lista de objetivos financeiros, contendo o valor necessário e o prazo previsto para cada meta. |
+
+Essa estrutura permite que o FinGuide IA personalize exemplos, explique conceitos financeiros de acordo com o perfil do cliente e realize simulações educativas, mantendo o foco em educação financeira e sem fornecer recomendações de investimento.
+
 ---
 
 ## Exemplo de Contexto Montado
@@ -169,4 +204,12 @@ PRODUTOS DISPONÍVEIS PARA EXPLICAR:
 - LCI/LCA (risco baixo)
 - Fundo Imobiliário - FII (risco médio)
 - Fundo de Ações (risco alto)
+```
+INSTRUÇÕES
+
+- Utilize apenas as informações presentes neste contexto.
+- Não recomende investimentos.
+- Não invente informações.
+- Caso não saiba responder, informe essa limitação.
+- As simulações possuem finalidade exclusivamente educativa.
 ```
